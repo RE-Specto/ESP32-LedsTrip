@@ -18,33 +18,25 @@ void bpm ();
 void nextPattern();
 void addGlitter( fract8 chanceOfGlitter);
 
-
-#if FASTLED_VERSION < 3001000
-#error "Requires FastLED 3.1 or later; check github for latest code."
-#endif
-
 #define DATA_PIN    23
-//#define CLK_PIN   4
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 #define NUM_LEDS    300
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS          128 //96
-#define FRAMES_PER_SECOND  1000 //120
+#define BRIGHTNESS  128 //96
+#define ONBOARD_LED 1 // pin 1 is onboard LED
+#define ONBOARD_BTN 0 // pin 0 is "boot" button on ESP32
 
 void setup() {
-  //delay(3000); // 3 second delay for recovery
-  
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  //FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 
-  pinMode(1,OUTPUT); // pin 1 is onboard LED
-  digitalWrite(1,HIGH); // led is inverted
+  pinMode(ONBOARD_LED,OUTPUT);
+  digitalWrite(ONBOARD_LED,HIGH); // onboard led is inverted
 }
 
 
@@ -62,19 +54,17 @@ void loop()
 
   // send the 'leds' array out to the actual LED strip
   FastLED.show();  
-  // insert a delay to keep the framerate modest
-  //FastLED.delay(1000/FRAMES_PER_SECOND); 
 
   // do some periodic updates
   EVERY_N_MILLISECONDS( 1 ) { gHue++; } // slowly cycle the "base color" through the rainbow
   //EVERY_N_SECONDS( 60 ) { nextPattern(); } // change patterns periodically
-  if (!digitalRead(0)){ // "boot" switch on the esp32
+  if (!digitalRead(ONBOARD_BTN)){
     nextPattern();
-    while (!digitalRead(0)) //debounce
+    while (!digitalRead(ONBOARD_BTN)) //debounce
     {
-      digitalWrite(1,LOW); // pin 1 is onboard LED
+      digitalWrite(ONBOARD_LED,LOW);
       delay(50);
-      digitalWrite(1,HIGH);
+      digitalWrite(ONBOARD_LED,HIGH);
       delay(50);
     }
   }
