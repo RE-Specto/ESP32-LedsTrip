@@ -17,6 +17,9 @@ void juggle();
 void bpm ();
 void nextPattern();
 void addGlitter( fract8 chanceOfGlitter);
+void solidWhite();
+void off();
+
 
 #define DATA_PIN    23
 #define LED_TYPE    WS2811
@@ -42,7 +45,7 @@ void setup() {
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { rainbowWithGlitter, confetti, sinelon, juggle, bpm, rainbow };
+SimplePatternList gPatterns = { off, rainbowWithGlitter, confetti, sinelon, juggle, bpm, rainbow, solidWhite };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
@@ -51,6 +54,9 @@ void loop()
 {
   // Call the current pattern function once, updating the 'leds' array
   gPatterns[gCurrentPatternNumber]();
+
+  // slow down - later
+  //FastLED.delay(1000/FRAMES_PER_SECOND); 
 
   // send the 'leds' array out to the actual LED strip
   FastLED.show();  
@@ -133,4 +139,14 @@ void juggle() {
     leds[beatsin16(i+7,0,NUM_LEDS)] |= CHSV(dothue, 200, 255);
     dothue += 32;
   }
+}
+
+void off() {
+  FastLED.clear();
+  FastLED.delay(100); 
+}
+
+void solidWhite() {
+  fill_solid( leds, NUM_LEDS, CRGB::White );
+  FastLED.delay(100); 
 }
