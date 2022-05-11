@@ -340,7 +340,7 @@ if (brightness_prev==255) {
 }
 
 // Param for different pixel layouts
-const bool    kMatrixSerpentineLayout = true;
+const bool    kMatrixSerpentineLayout = false;
 // Set 'kMatrixSerpentineLayout' to false if your pixels are 
 // laid out all running the same way, like this:
 
